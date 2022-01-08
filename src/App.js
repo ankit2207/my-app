@@ -1,25 +1,70 @@
-import logo from './logo.svg';
+import { useState, useEffect } from 'react';
 import './App.css';
 
-function App() {
+function SearchBox({ searchItems }) {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <div style={{ padding: 20 }}>
+      <input
+        type='text'
+        name='search'
+        placeholder='Search...'
+        onChange={e => searchItems(e.target.value)}
+      />
     </div>
-  );
+  )
+}
+
+function App() {
+
+  const [data, setData] = useState(null);
+
+  useEffect(() => {
+    fetch(`https://jsonplaceholder.typicode.com/users/`)
+      .then((response) => response.json())
+      .then(setData);
+  }, []);
+
+  const [searchInput, setSearchInput] = useState('');
+  const [filteredResults, setFilteredResults] = useState([]);
+  const searchItems = (searchValue) => {
+    setSearchInput(searchValue)
+      const filteredData = data.filter((item) => {
+        return Object.values(item).join('').toLowerCase().includes(searchInput.toLowerCase())
+      })
+      setFilteredResults(filteredData)
+  };
+
+    return (
+      <>
+        <SearchBox searchItems={searchItems} />
+        {searchInput.length > 1 ? (
+          filteredResults && filteredResults.map((item) => {
+            return (
+              <div>
+                <ul>
+                  <li key={item.id}>
+                    <span>{item.name}</span>
+                  </li>
+                </ul>
+              </div>
+            )
+          })
+        ) : (
+          data && data.map((item) => {
+            return (
+              <div>
+                <ul>
+                  <li key={item.id}>
+                    <span>{item.name}</span>
+                  </li>
+                </ul>
+              </div>
+            )
+          })
+        )
+        }
+      </>
+    )
 }
 
 export default App;
